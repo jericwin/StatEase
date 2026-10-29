@@ -21,8 +21,6 @@ except ImportError:
 from sqlalchemy.orm import Session
 
 from .models import Project, User
-from .services import create_dataset, latest_version
-from .storage import new_relative_path, resolve
 
 
 def _fertilizer(seed: int = 7) -> Any:
@@ -183,8 +181,9 @@ def _apply_levels(version, demo: dict[str, Any]) -> None:
 def create_demo_project(db: Session, user: User, key: str = "fertilizer") -> tuple[Project, int | None]:
     """Creates the demo project, runs its objectives and builds an editable report. Returns (project, report id)."""
     from .reports.service import build_report
-    from .services import refresh_profile
+    from .services import create_dataset, latest_version, refresh_profile
     from .stats.planner import parse_objectives
+    from .storage import new_relative_path, resolve
 
     demo = DEMOS.get(key)
     if demo is None:
