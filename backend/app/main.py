@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import logging
 from contextlib import asynccontextmanager
+import logging
+import os
 from pathlib import Path
 
 from fastapi import APIRouter, FastAPI
@@ -9,7 +10,38 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .api import analyses, auth, datasets, exports, misc, projects, python_console, reports, sql
+from .api import auth, misc, projects
+
+try:
+    from .api import datasets
+except Exception:
+    datasets = None
+
+try:
+    from .api import reports
+except Exception:
+    reports = None
+
+try:
+    from .api import analyses
+except Exception:
+    analyses = None
+
+try:
+    from .api import exports
+except Exception:
+    exports = None
+
+try:
+    from .api import sql
+except Exception:
+    sql = None
+
+try:
+    from .api import python_console
+except Exception:
+    python_console = None
+
 from .config import BACKEND_DIR, get_settings
 from .errors import install_handlers
 
@@ -17,25 +49,31 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name
 
 
 def run_migrations() -> None:
-    from alembic import command
-    from alembic.config import Config
+    try:
+        from alembic import command
+        from alembic.config import Config
 
-    cfg = Config(str(BACKEND_DIR / "alembic.ini"))
-    cfg.set_main_option("script_location", str(BACKEND_DIR / "alembic"))
-    cfg.set_main_option("sqlalchemy.url", get_settings().database_url)
-    command.upgrade(cfg, "head")
+        cfg = Config(str(BACKEND_DIR / "alembic.ini"))
+        cfg.set_main_option("script_location", str(BACKEND_DIR / "alembic"))
+        cfg.set_main_option("sqlalchemy.url", get_settings().database_url)
+        command.upgrade(cfg, "head")
+    except Exception as e:
+        logging.warning("Migrations skipped or failed: %s", e)
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     s = get_settings()
     s.ensure_dirs()
-    run_migrations()
+    if not os.environ.get("VERCEL") and not os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        run_migrations()
     if s.environment == "production" and s.secret_key == "dev-insecure-change-me":
         raise RuntimeError("Set STATEASE_SECRET_KEY before running in production.")
-    from .jobs import recover_interrupted
-
-    recover_interrupted()
+    try:
+        from .jobs import recover_interrupted
+        recover_interrupted()
+    except Exception:
+        pass
     yield
 
 
@@ -48,9 +86,11 @@ def create_app() -> FastAPI:
                        allow_methods=["*"], allow_headers=["Authorization", "Content-Type"])
     install_handlers(app)
     api = APIRouter(prefix="/api/v1")
-    for r in (auth.router, projects.router, datasets.router, reports.router, analyses.router, exports.router, misc.router,
-              sql.router, python_console.router):
+    for r in (auth.router, projects.router, misc.router):
         api.include_router(r)
+    for opt in (datasets, reports, analyses, exports, sql, python_console):
+        if opt and hasattr(opt, "router"):
+            api.include_router(opt.router)
     app.include_router(api)
 
     # Serve the built frontend when present (single-container deployment).

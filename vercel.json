@@ -1,24 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "name": "statease",
   "framework": "vite",
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://statease-api.onrender.com/api/$1"
+      "destination": "/api/index.py"
     },
     {
-      "source": "/docs",
-      "destination": "https://statease-api.onrender.com/docs"
-    },
-    {
-      "source": "/openapi.json",
-      "destination": "https://statease-api.onrender.com/openapi.json"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

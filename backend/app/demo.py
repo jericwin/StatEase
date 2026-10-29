@@ -4,10 +4,20 @@ and are never added to a user's own projects."""
 from __future__ import annotations
 
 from functools import lru_cache
+import json
+from pathlib import Path
 from typing import Any
 
-import numpy as np
-import polars as pl
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
+try:
+    import polars as pl
+except ImportError:
+    pl = None
+
 from sqlalchemy.orm import Session
 
 from .models import Project, User
@@ -15,8 +25,10 @@ from .services import create_dataset, latest_version
 from .storage import new_relative_path, resolve
 
 
-def _fertilizer(seed: int = 7) -> pl.DataFrame:
+def _fertilizer(seed: int = 7) -> Any:
     """Pechay grown under three fertilizer treatments; growth measured 30 days after transplanting."""
+    if np is None or pl is None:
+        return None
     rng = np.random.default_rng(seed)
     n = 15
     rows = []
@@ -33,7 +45,9 @@ def _fertilizer(seed: int = 7) -> pl.DataFrame:
     return pl.DataFrame(rows)
 
 
-def _experiment(seed: int = 5) -> pl.DataFrame:
+def _experiment(seed: int = 5) -> Any:
+    if np is None or pl is None:
+        return None
     rng = np.random.default_rng(seed)
     n = 24
     rows = []
@@ -47,7 +61,9 @@ def _experiment(seed: int = 5) -> pl.DataFrame:
     return df.with_columns(pl.when(pl.int_range(pl.len()) == 7).then(None).otherwise(pl.col("Posttest")).alias("Posttest"))
 
 
-def _survey(n: int = 240, seed: int = 2026) -> pl.DataFrame:
+def _survey(n: int = 240, seed: int = 2026) -> Any:
+    if np is None or pl is None:
+        return None
     rng = np.random.default_rng(seed)
     gender = rng.choice(["Female", "Male"], n, p=[0.55, 0.45])
     program = rng.choice(["Business", "Education", "Engineering", "Nursing"], n, p=[0.3, 0.25, 0.25, 0.2])
@@ -70,7 +86,7 @@ def _survey(n: int = 240, seed: int = 2026) -> pl.DataFrame:
                            pl.mean_horizontal([f"PI{i}" for i in range(1, 4)]).round(2).alias("Purchase Intention"))
 
 
-def synthetic_survey() -> pl.DataFrame:
+def synthetic_survey() -> Any:
     return _survey()
 
 
@@ -125,9 +141,31 @@ DEMOS: dict[str, dict[str, Any]] = {
 
 
 def list_demos() -> list[dict[str, Any]]:
+    cache_file = Path(__file__).parent / "demo_cache.json"
+    if cache_file.exists():
+        try:
+            cached = json.loads(cache_file.read_text(encoding="utf-8"))
+            out = []
+            for key, d in cached.items():
+                out.append({
+                    "key": key,
+                    "title": d.get("title", ""),
+                    "summary": d.get("summary", ""),
+                    "rows": d.get("n_rows", len(d.get("rows", []))),
+                    "columns": d.get("columns", []),
+                    "objectives": d.get("objectives", []),
+                })
+            if out:
+                return out
+        except Exception:
+            pass
+    if pl is None:
+        return []
     out = []
     for key, d in DEMOS.items():
         df = d["data"]()
+        if df is None:
+            continue
         out.append({"key": key, "title": d["title"], "summary": d["summary"], "rows": df.height,
                     "columns": df.columns, "objectives": d["objectives"]})
     return out
@@ -173,6 +211,17 @@ def create_demo_project(db: Session, user: User, key: str = "fertilizer") -> tup
 @lru_cache(maxsize=8)
 def public_preview(key: str) -> dict[str, Any]:
     """Read-only preview for visitors who are not signed in: data sample plus computed results."""
+    cache_file = Path(__file__).parent / "demo_cache.json"
+    if cache_file.exists():
+        try:
+            cached = json.loads(cache_file.read_text(encoding="utf-8"))
+            if key in cached:
+                return cached[key]
+        except Exception:
+            pass
+    if pl is None:
+        raise RuntimeError("Data science libraries are not loaded in serverless mode.")
+
     from .stats.base import REGISTRY, Context, VarMeta
     from .stats.engine import heading
     from .stats.inference_shim import infer_meta
@@ -210,4 +259,3 @@ def _preview_plans(key: str) -> list[tuple[str, dict[str, Any]]]:
                                                                                  "Purchase Intention"]}, "options": {}}),
             ("correlation", {"variables": {"variables": ["Service Quality", "Customer Satisfaction", "Purchase Intention"]},
                              "options": {}})]
-

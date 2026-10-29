@@ -3,13 +3,32 @@
 from __future__ import annotations
 
 from functools import lru_cache
+import os
 from pathlib import Path
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
+
+
+def _get_default_database_url() -> str:
+    url = (
+        os.environ.get("STATEASE_DATABASE_URL")
+        or os.environ.get("POSTGRES_URL")
+        or os.environ.get("DATABASE_URL")
+        or os.environ.get("POSTGRES_PRISMA_URL")
+    )
+    if url:
+        return url
+    return f"sqlite:///{(BACKEND_DIR / 'var' / 'statease.db').as_posix()}"
+
+
+def _get_default_storage_dir() -> Path:
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        return Path("/tmp/storage")
+    return BACKEND_DIR / "var" / "storage"
 
 
 class Settings(BaseSettings):
@@ -19,17 +38,27 @@ class Settings(BaseSettings):
 
     # Metadata database. SQLite by default (single-user local mode); set a
     # postgresql+psycopg:// URL for the full multi-user deployment.
-    database_url: str = f"sqlite:///{(BACKEND_DIR / 'var' / 'statease.db').as_posix()}"
+    database_url: str = Field(default_factory=_get_default_database_url)
 
     @field_validator("database_url", mode="after")
     @classmethod
     def normalize_db_url(cls, v: str) -> str:
-        if v and v.startswith("postgres://"):
-            return "postgresql://" + v[len("postgres://"):]
+        if not v or v.startswith("sqlite:///"):
+            env_db = (
+                os.environ.get("STATEASE_DATABASE_URL")
+                or os.environ.get("POSTGRES_URL")
+                or os.environ.get("DATABASE_URL")
+            )
+            if env_db:
+                v = env_db
+        if v.startswith("postgres://"):
+            return "postgresql+psycopg://" + v[len("postgres://"):]
+        if v.startswith("postgresql://") and not v.startswith("postgresql+"):
+            return "postgresql+psycopg://" + v[len("postgresql://"):]
         return v
 
     # Root for uploaded files, Parquet datasets and generated reports.
-    storage_dir: Path = BACKEND_DIR / "var" / "storage"
+    storage_dir: Path = Field(default_factory=_get_default_storage_dir)
 
     # "password" (default): accounts with email/password and optional Google sign-in.
     # "local": a single local administrator is provisioned automatically; no login (offline use only).
@@ -61,7 +90,7 @@ class Settings(BaseSettings):
     def google_enabled(self) -> bool:
         return bool(self.google_client_id and self.google_client_secret)
 
-    cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    cors_origins: list[str] = ["*"]
 
     # Resource limits
     max_upload_mb: int = 512
@@ -102,11 +131,14 @@ class Settings(BaseSettings):
         return self.storage_dir / "sandbox"
 
     def ensure_dirs(self) -> None:
-        for d in (self.storage_dir, self.datasets_dir, self.uploads_dir, self.exports_dir,
-                  self.sqlite_connections_dir, self.sandbox_dir):
-            d.mkdir(parents=True, exist_ok=True)
-        if self.database_url.startswith("sqlite:///"):
-            Path(self.database_url.removeprefix("sqlite:///")).parent.mkdir(parents=True, exist_ok=True)
+        try:
+            for d in (self.storage_dir, self.datasets_dir, self.uploads_dir, self.exports_dir,
+                      self.sqlite_connections_dir, self.sandbox_dir):
+                d.mkdir(parents=True, exist_ok=True)
+            if self.database_url.startswith("sqlite:///"):
+                Path(self.database_url.removeprefix("sqlite:///")).parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass
 
 
 @lru_cache
