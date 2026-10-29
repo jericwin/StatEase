@@ -1,0 +1,120 @@
+<!doctype html>
+<!--
+  Source for statease-comparison.png. Not part of the website.
+  Re-render: see docs/brand/README.md.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>StatEase comparison</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=block" />
+<style>
+  :root { --paper: #f6f3ec; --paper-2: #ece6da; --line: #ddd5c6; --ink: #14213a; --ink-2: #5a6274; --rust: #b4532a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 13px/1.4 'IBM Plex Sans', sans-serif; }
+  figure { margin: 0; width: 1160px; padding: 44px 48px 36px; background: var(--paper); }
+  .kicker { font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2); }
+  h1 { font: 600 34px/1.1 'Source Serif 4', serif; margin: 8px 0 22px; letter-spacing: -.01em; }
+  figcaption { font: 15px 'Source Serif 4', serif; margin-bottom: 14px; }
+  figcaption b { font-weight: 600; margin-right: 6px; }
+  figcaption i { font-style: italic; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  thead tr { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); }
+  th, td { text-align: left; vertical-align: top; }
+  thead th { padding: 12px; font-size: 14px; font-weight: 600; vertical-align: bottom; }
+  thead th:first-child { padding-left: 0; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); }
+  .se { background: var(--paper-2); }
+  thead th.se { position: relative; }
+  thead th.se::before { content: ''; position: absolute; left: 0; right: 0; top: -2px; height: 4px; background: var(--rust); }
+  .group th { padding: 18px 0 6px; font: italic 400 13.5px 'Source Serif 4', serif; color: var(--ink-2); }
+  tbody tr.row { border-top: 1px solid var(--line); }
+  tbody th { padding: 10px 12px 10px 0; font-weight: 500; }
+  tbody td { padding: 10px 12px; }
+  .cell { display: flex; gap: 8px; align-items: flex-start; }
+  .cell svg { flex: none; margin-top: 2px; }
+  .note { color: var(--ink-2); }
+  tfoot tr { border-top: 2px solid var(--ink); }
+  tfoot td { padding-top: 12px; font-size: 12px; color: var(--ink-2); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; margin-right: 18px; }
+  p.foot { margin: 14px 0 0; max-width: 860px; font-size: 12px; color: var(--ink-2); line-height: 1.55; }
+  p.foot i { font-family: 'Source Serif 4', serif; }
+  .masthead { display: flex; align-items: center; justify-content: space-between; padding-bottom: 18px; margin-bottom: 26px; border-bottom: 1px solid var(--line); }
+  .lockup { display: flex; align-items: center; gap: 12px; }
+  .lockup .name { font: 600 26px/1 'Source Serif 4', serif; letter-spacing: -.01em; }
+  .lockup .name small { font: 500 14px 'IBM Plex Sans', sans-serif; color: var(--ink-2); margin-left: 6px; letter-spacing: 0; }
+  thead th { line-height: 18px; }
+  thead th.se span { display: inline-flex; align-items: center; gap: 7px; vertical-align: bottom; }
+  thead th.se span svg { margin-top: -3px; }
+</style>
+</head>
+<body>
+<figure id="figure">
+  <div class="masthead">
+    <div class="lockup"><span class="mark" data-size="40"></span><span class="name">StatEase<small>Analytics</small></span></div>
+    <div class="kicker">How it compares</div>
+  </div>
+  <h1>Where StatEase fits</h1>
+  <figcaption><b>Table 1</b><i>StatEase and the tools students most often use for a thesis</i></figcaption>
+  <table>
+    <colgroup><col style="width:24%" /><col style="width:19%" /><col style="width:19%" /><col style="width:19%" /><col style="width:19%" /></colgroup>
+    <thead><tr><th>Feature</th><th class="se"><span><span class="mark" data-size="18"></span>StatEase</span></th><th>JASP</th><th>Google Forms</th><th>Python</th></tr></thead>
+    <tbody id="rows"></tbody>
+    <tfoot><tr><td colspan="5" class="legend" id="legend"></td></tr></tfoot>
+  </table>
+  <p class="foot">
+    <i>Note.</i> * StatEase does not use generative AI. Each sentence of an interpretation is filled in from the statistics it has just
+    computed, so the text always matches the table.
+    Ratings are based on each product’s publicly described features as of October 2026; features change between versions.
+    JASP, Google Forms and Python are trademarks of their owners; StatEase is not affiliated with them.
+  </p>
+</figure>
+<script>
+  // [feature, StatEase, JASP, Google Forms, Python]; each cell is [level, note]; level: yes | part | no
+  const GROUPS = [
+    ['Access', [
+      ['Works on phone and desktop', ['yes', 'Any browser; tested from 360 px wide'], ['no', 'Desktop app for Windows, macOS, Linux'], ['yes', 'Any browser'], ['part', 'Desktop, or browser notebooks such as Colab']],
+      ['Nothing to install', ['yes'], ['no', 'Installed on each computer'], ['yes'], ['part', 'Python and libraries, unless using Colab']],
+      ['No programming', ['yes'], ['yes'], ['yes'], ['no', 'Every analysis is written as code']],
+      ['Works offline', ['part', 'When self-hosted'], ['yes'], ['no'], ['yes']],
+    ]],
+    ['Analysis', [
+      ['Collects survey responses', ['no', 'Import the Forms or Sheets export'], ['no'], ['yes'], ['no']],
+      ['Data cleaning before analysis', ['yes', 'Finds problems, suggests fixes; exports the cleaned file with a cleaning log'], ['part', 'Filters and computed columns'], ['part', 'By hand in Google Sheets'], ['yes', 'With pandas code']],
+      ['Inferential tests (t-test, ANOVA, correlation…)', ['yes', '29 common thesis procedures'], ['yes', 'Very wide range'], ['no', 'Response summaries and charts only'], ['yes', 'Anything a library provides']],
+      ['Bayesian analyses', ['no'], ['yes'], ['no'], ['yes', 'Via libraries']],
+      ['Suggests the right test for the data', ['yes', 'From variable types; can be overridden'], ['no', 'You choose the test'], ['no'], ['no', 'You choose and code it']],
+      ['Assumption checks', ['yes', 'Run and explained automatically'], ['yes', 'Ticked as options'], ['no'], ['part', 'Written by hand']],
+      ['Starts from your research objectives', ['yes', 'Statement of the problem → analyses'], ['no'], ['no'], ['no']],
+    ]],
+    ['Writing up', [
+      ['Written interpretation of each result', ['yes', 'From the computed values, by fixed rules*'], ['no', 'Tables only'], ['no'], ['no', 'You write the text']],
+      ['Editable Word report', ['yes', 'Numbered APA tables and figures'], ['part', 'Copy tables; export HTML or PDF'], ['no'], ['part', 'With extra code']],
+      ['Excel output', ['yes', 'Numeric cells and native charts'], ['no', 'Results export as HTML or PDF'], ['part', 'Raw responses to Sheets'], ['part', 'With extra code']],
+      ['Reproducible record', ['yes', 'Python code for each result'], ['part', 'Saved .jasp analysis file'], ['no'], ['yes', 'The code is the record']],
+    ]],
+    ['Developer options', [
+      ['SQL queries on your data', ['yes', 'SQL workbench; results saved as new datasets'], ['no'], ['no'], ['yes', 'With pandas, DuckDB or SQLite']],
+      ['Connect to a database (PostgreSQL, MySQL, SQLite)', ['yes', 'Read-only connections from the workbench'], ['no'], ['no'], ['yes', 'With driver libraries']],
+      ['Run your own code', ['yes', 'Built-in Python console'], ['part', 'R code through its R module'], ['part', 'Apps Script automation'], ['yes']],
+    ]],
+  ]
+  const LABEL = { yes: 'Yes', part: 'Partly, or with extra work', no: 'No' }
+  const disc = (level, color) => `<svg width="14" height="14" viewBox="0 0 14 14" aria-label="${LABEL[level]}"><circle cx="7" cy="7" r="6" fill="${level === 'yes' ? color : 'none'}" stroke="${color}" stroke-width="1.4"/>${level === 'part' ? `<path d="M7 1a6 6 0 0 1 0 12z" fill="${color}"/>` : ''}</svg>`
+  const rows = []
+  for (const [group, items] of GROUPS) {
+    rows.push(`<tr class="group"><th>${group}</th><td class="se"></td><td colspan="3"></td></tr>`)
+    for (const [feature, ...cells] of items) {
+      rows.push(`<tr class="row"><th>${feature}</th>${cells.map(([lv, note], i) => {
+        const color = i === 0 && lv !== 'no' ? 'var(--rust)' : 'var(--ink)'
+        return `<td class="${i === 0 ? 'se' : ''}"><div class="cell">${disc(lv, color)}${note ? `<span class="note">${note}</span>` : ''}</div></td>`
+      }).join('')}</tr>`)
+    }
+  }
+  document.getElementById('rows').innerHTML = rows.join('')
+  document.getElementById('legend').innerHTML = ['yes', 'part', 'no'].map((l) => `<span>${disc(l, 'var(--ink)')} ${LABEL[l]}</span>`).join('')
+  // The two-colour mark, same paths as the app's logo.
+  const MARK = `<svg width="SIZE" height="SIZE" viewBox="0 0 32 32"><path fill="#14213a" d="M0.5 23.7L0.5 21.8L1.0 21.4L1.6 20.9L2.1 20.3L2.7 19.7L3.2 19.0L3.8 18.2L4.3 17.3L4.9 16.4L5.4 15.3L6.0 14.3L6.5 13.2L7.1 12.1L7.6 11.0L8.2 9.9L8.7 8.8L9.3 7.8L9.8 6.9L10.4 6.1L10.9 5.4L11.5 4.8L12.0 4.5L12.6 4.2L13.1 4.2L13.7 4.3L14.2 4.6L14.8 5.1L15.3 5.7L15.9 6.5L16.4 7.3L17.0 8.3L17.0 23.7Z"/><path fill="#b4532a" d="M18.3 23.7L18.3 10.8L19.4 13.1L20.5 15.2L21.6 17.2L22.7 18.9L23.8 20.2L24.9 21.3L26.0 22.1L27.1 22.7L28.2 23.1L29.3 23.3L30.4 23.5L31.5 23.6L31.5 23.7Z"/><rect fill="#14213a" x="0.5" y="25.2" width="31" height="2.6" rx="1.3"/></svg>`
+  document.querySelectorAll('.mark').forEach((el) => { el.outerHTML = MARK.replaceAll('SIZE', el.dataset.size) })
+</script>
+</body>
+</html>

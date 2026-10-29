@@ -1,0 +1,21 @@
+# Default: SQLite metadata and email/password accounts (no database server required).
+#   docker compose up --build                 -> http://localhost:8000
+# Production (PostgreSQL + password accounts): see docker-compose.prod.yml.
+
+services:
+  app:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      STATEASE_ENVIRONMENT: ${STATEASE_ENVIRONMENT:-development}
+      STATEASE_DATABASE_URL: ${STATEASE_DATABASE_URL:-sqlite:////data/statease.db}
+      STATEASE_AUTH_MODE: ${STATEASE_AUTH_MODE:-password}
+      STATEASE_PUBLIC_URL: ${STATEASE_PUBLIC_URL:-http://localhost:8000}
+      STATEASE_GOOGLE_CLIENT_ID: ${STATEASE_GOOGLE_CLIENT_ID:-}
+      STATEASE_GOOGLE_CLIENT_SECRET: ${STATEASE_GOOGLE_CLIENT_SECRET:-}
+      STATEASE_SECRET_KEY: ${STATEASE_SECRET_KEY:-dev-insecure-change-me}
+    volumes: ["statease-data:/data"]
+    restart: unless-stopped
+
+volumes:
+  statease-data:

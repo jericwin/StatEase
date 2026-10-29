@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.ruff_cache/
+
+# Databases and storage
+backend/var/
+var/
+*.sqlite
+*.sqlite3
+*.db
+*.parquet
+storage/
+
+# Logs
+*.log
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# Node
+node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+
+# IDE and tool configs
+.idea/
+.vscode/
+.claude/
+.gemini/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,31 @@
+# Production profile: PostgreSQL metadata and email/password accounts.
+#   cp .env.example .env   # set STATEASE_SECRET_KEY and POSTGRES_PASSWORD
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+
+services:
+  app:
+    env_file: .env
+    environment:
+      STATEASE_ENVIRONMENT: production
+      STATEASE_AUTH_MODE: password
+      STATEASE_DATABASE_URL: postgresql+psycopg://statease:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/statease
+      STATEASE_SECRET_KEY: ${STATEASE_SECRET_KEY:?set STATEASE_SECRET_KEY in .env}
+      STATEASE_CORS_ORIGINS: '["${PUBLIC_ORIGIN:-http://localhost:8000}"]'
+    depends_on:
+      db: { condition: service_healthy }
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: statease
+      POSTGRES_USER: statease
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes: ["statease-pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U statease"]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  statease-pg:
