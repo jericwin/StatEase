@@ -43,3 +43,4 @@ frontend/playwright-report/
 Thumbs.db
 
 .vercel
+.env*
