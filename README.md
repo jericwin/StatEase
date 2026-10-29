@@ -47,7 +47,7 @@ Try it without your own data: the landing page has three public demos (Fertilize
 
 - **Email and password** — always available in the default `password` mode; passwords are hashed with scrypt; repeated failures are throttled.
 - **Email verification** — sign-up e-mails a 6-digit code (15 minutes, 5 attempts, resend after 30 s); the account cannot sign in until the code is entered. Turn off with `STATEASE_REQUIRE_EMAIL_VERIFICATION=false`. Without SMTP the code is written to the server log.
-- **Forgot password** — sends a one-hour, single-use link by e-mail (configure `STATEASE_SMTP_*`). Without SMTP the link is written to the server log so an administrator can pass it on. Resetting signs out all other sessions.
+- **Forgot password** — sends a one-hour, single-use link by e-mail (configure `STATEASE_SMTP_*`, or the Gmail API with `STATEASE_GMAIL_REFRESH_TOKEN` from `scripts/gmail_token.py` where SMTP ports are blocked). Without SMTP the link is written to the server log so an administrator can pass it on. Resetting signs out all other sessions.
 - **Continue with Google** — real OAuth 2.0 / OpenID Connect (authorization code flow with PKCE and a signed state cookie). Create an OAuth client of type *Web application* in Google Cloud Console, add the redirect URI `<STATEASE_PUBLIC_URL>/api/v1/auth/google/callback`, and set `STATEASE_GOOGLE_CLIENT_ID`, `STATEASE_GOOGLE_CLIENT_SECRET` and `STATEASE_PUBLIC_URL`. Until these are set the button is shown greyed out with a short note. The client secret stays on the server.
 - If the installation was previously used in local mode, the **first account created takes over the existing local projects**, so no work is hidden.
 
@@ -93,7 +93,7 @@ Methods, formulas, assumptions and limitations: [docs/STATISTICAL_METHODS.md](do
 ## Tests
 
 ```bash
-cd backend && .venv/Scripts/python -m pytest          # 51 tests: R reference values, edge cases, auth (incl. Google flow), reports, full API workflow
+cd backend && .venv/Scripts/python -m pytest          # 58 tests: R reference values, edge cases, auth (incl. Google flow), reports, full API workflow
 cd backend && .venv/Scripts/ruff check app tests
 cd frontend && npm run typecheck && npm test           # TypeScript strict + Vitest (14 tests)
 cd frontend && npm run build && npx playwright test    # E2E against a running backend (E2E_BASE_URL, default :8000; E2E_SERVER_LOG = its log, read for the sign-up code; run it with STATEASE_SMTP_HOST= empty)
@@ -111,6 +111,14 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
 
 The first account registered becomes the administrator. Put the service behind HTTPS (reverse proxy). See [docs/SECURITY.md](docs/SECURITY.md) and [docs/DATABASE.md](docs/DATABASE.md) (including backup and restore).
+
+### Hosted deployment (statease.vercel.app)
+
+- **Frontend:** Vercel builds `frontend/` and proxies `/api/*` to the backend (`vercel.json`), adding HSTS and other security headers.
+- **Backend:** Render web service `statease-api` from `render.yaml` (Docker, free plan, region next to the database). Pushes to `main` deploy automatically. Secrets marked `sync: false` are set in the Render dashboard.
+- **Database:** Neon PostgreSQL. The free Render plan has no persistent disk, so `STATEASE_PERSIST_FILES_IN_DB=true` keeps datasets, originals and exports in the `stored_files` table and restores them after a restart.
+- **E-mail:** Render's free plan blocks SMTP, so mail is sent through the Gmail API (`STATEASE_GMAIL_REFRESH_TOKEN`).
+- **Keep-warm:** `.github/workflows/keep-warm.yml` pings the API every 10 minutes so the free instance does not sleep.
 
 ## Performance
 
