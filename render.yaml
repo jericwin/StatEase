@@ -17,9 +17,11 @@ services:
       - key: STATEASE_SECRET_KEY
         generateValue: true
       - key: STATEASE_DATABASE_URL
-        fromDatabase:
-          name: statease-db
-          property: connectionString
+        value: sqlite:////data/statease.db
+      - key: STATEASE_STORAGE_DIR
+        value: /data/storage
+      - key: STATEASE_PUBLIC_URL
+        value: https://statease.vercel.app
       - key: STATEASE_SMTP_HOST
         value: smtp.gmail.com
       - key: STATEASE_SMTP_PORT
@@ -34,8 +36,3 @@ services:
         value: "true"
       - key: STATEASE_CORS_ORIGINS
         value: '["https://statease.vercel.app"]'
-
-databases:
-  - name: statease-db
-    plan: free
-    region: oregon
