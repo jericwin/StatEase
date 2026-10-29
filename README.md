@@ -114,7 +114,7 @@ The first account registered becomes the administrator. Put the service behind H
 
 ### Hosted deployment (statease.vercel.app)
 
-- **Frontend:** Vercel builds `frontend/` and proxies `/api/*` to the backend (`vercel.json`), adding HSTS and other security headers.
+- **Frontend:** Vercel builds `frontend/` and proxies `/api/*` to the backend (`vercel.json`), adding HSTS and other security headers. Pushes to `main` deploy automatically.
 - **Backend:** Render web service `statease-api` from `render.yaml` (Docker, free plan, region next to the database). Pushes to `main` deploy automatically. Secrets marked `sync: false` are set in the Render dashboard.
 - **Database:** Neon PostgreSQL. The free Render plan has no persistent disk, so `STATEASE_PERSIST_FILES_IN_DB=true` keeps datasets, originals and exports in the `stored_files` table and restores them after a restart.
 - **E-mail:** Render's free plan blocks SMTP, so mail is sent through the Gmail API (`STATEASE_GMAIL_REFRESH_TOKEN`).
