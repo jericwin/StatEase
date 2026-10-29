@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: statease-api
+    runtime: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    disk:
+      name: statease-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: STATEASE_ENVIRONMENT
+        value: production
+      - key: STATEASE_AUTH_MODE
+        value: password
+      - key: STATEASE_SECRET_KEY
+        generateValue: true
+      - key: STATEASE_DATABASE_URL
+        fromDatabase:
+          name: statease-db
+          property: connectionString
+      - key: STATEASE_SMTP_HOST
+        value: smtp.gmail.com
+      - key: STATEASE_SMTP_PORT
+        value: "587"
+      - key: STATEASE_SMTP_USERNAME
+        value: punay.jeric@gmail.com
+      - key: STATEASE_SMTP_PASSWORD
+        sync: false
+      - key: STATEASE_SMTP_FROM
+        value: StatEase Analytics <punay.jeric@gmail.com>
+      - key: STATEASE_SMTP_STARTTLS
+        value: "true"
+      - key: STATEASE_CORS_ORIGINS
+        value: '["https://statease.vercel.app"]'
+
+databases:
+  - name: statease-db
+    plan: free
+    region: oregon
