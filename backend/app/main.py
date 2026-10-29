@@ -3,6 +3,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 import logging
 import os
+import re
 from pathlib import Path
 
 from fastapi import APIRouter, FastAPI, Request
@@ -60,7 +61,8 @@ def run_migrations() -> None:
         cfg.set_main_option("sqlalchemy.url", get_settings().database_url)
         command.upgrade(cfg, "head")
     except Exception as e:
-        logging.warning("Migrations skipped or failed: %s", e)
+        # Driver errors can echo the connection string; never write its password to the log.
+        logging.warning("Migrations skipped or failed: %s", re.sub(r"://([^:/@\s]+):[^@\s]+@", r"://\1:***@", str(e)))
 
 
 @asynccontextmanager
