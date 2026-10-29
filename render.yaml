@@ -29,6 +29,9 @@ services:
         sync: false
       - key: STATEASE_GOOGLE_CLIENT_SECRET
         sync: false
+      # Render's free plan blocks SMTP ports; mail goes through the Gmail API (scripts/gmail_token.py).
+      - key: STATEASE_GMAIL_REFRESH_TOKEN
+        sync: false
       - key: STATEASE_SMTP_HOST
         value: smtp.gmail.com
       - key: STATEASE_SMTP_PORT

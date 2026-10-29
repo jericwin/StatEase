@@ -85,6 +85,9 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     smtp_from: str = "StatEase Analytics <no-reply@localhost>"
     smtp_starttls: bool = True
+    # Gmail API alternative to SMTP: a refresh token with the gmail.send scope, granted to the Google
+    # OAuth client above by the sending account (see scripts/gmail_token.py).
+    gmail_refresh_token: str = ""
     password_reset_minutes: int = 60
     # New email/password accounts must confirm their address with an e-mailed code.
     require_email_verification: bool = True
