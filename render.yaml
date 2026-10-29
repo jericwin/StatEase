@@ -5,10 +5,6 @@ services:
     dockerfilePath: Dockerfile
     plan: free
     region: oregon
-    disk:
-      name: statease-data
-      mountPath: /data
-      sizeGB: 1
     envVars:
       - key: STATEASE_ENVIRONMENT
         value: production
@@ -17,9 +13,7 @@ services:
       - key: STATEASE_SECRET_KEY
         generateValue: true
       - key: STATEASE_DATABASE_URL
-        value: sqlite:////data/statease.db
-      - key: STATEASE_STORAGE_DIR
-        value: /data/storage
+        sync: false
       - key: STATEASE_PUBLIC_URL
         value: https://statease.vercel.app
       - key: STATEASE_SMTP_HOST
