@@ -477,7 +477,7 @@ RANK = register(AnalysisSpec(
     id="rank_groups", name="Group Ranking", plain_name="Find the most acceptable group",
     category="compare",
     description="Ranks groups (e.g. formulations) by their mean scores to show which is most acceptable.",
-    when_to_use="Objectives such as 'Which formulation is the most acceptable?'.",
+    when_to_use="Objectives such as 'Which group rated the module highest?'.",
     roles=[Role("group", "Groups", "The column that identifies the groups.", CATEGORICAL_LEVELS),
            Role("measures", "Measures", "Scores used for ranking.", SCALE_LEVELS, 1, 40)],
     options=[Option("decide_by", "Rank by", "text", "average",

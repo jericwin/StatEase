@@ -13,17 +13,16 @@ import { useCatalog, useDataset } from '@/lib/queries'
 import type { AnalysisSpec, Dataset, Objective, ObjectiveAnalysis, Report } from '@/lib/types'
 import { asArray, cn } from '@/lib/utils'
 
-export const EXAMPLE = `1. What is the demographic profile of the respondents in terms of:
+export const EXAMPLE = `1. What is the profile of the students in terms of:
 1.1 Age
-1.2 Gender
-2. What is the level of acceptability of the product in terms of:
-2.1 Appearance
-2.2 Aroma
-2.3 Taste
-2.4 Texture
-2.5 Overall acceptability
-3. Which formulation is the most acceptable?
-4. Is there a significant difference in the level of acceptability between the two formulations?`
+1.2 Year level
+2. What is the level of satisfaction of the students with the online learning module in terms of:
+2.1 Content
+2.2 Ease of use
+2.3 Engagement
+2.4 Overall satisfaction
+3. Which group rated the module highest?
+4. Is there a significant difference in the level of satisfaction between the two groups?`
 
 function categoriesOf(dataset: Dataset, name: string): string[] {
   const v = dataset.variables.find((x) => x.name === name)
