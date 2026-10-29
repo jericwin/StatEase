@@ -86,33 +86,33 @@ export function focusMeans(m: Means | null, measure: string): Means | null {
 
 /** An APA-style table set like a printed page: group means per measure and the p value of the test chosen for it. */
 export function PaperTable({ main, desc, groups, caption, number }: { main: ResultTable; desc: ResultTable; groups: string[]; caption: string; number: number }) {
-  const rows = main.rows.slice(0, 5)
+  const rows = main.rows.slice(0, 4)
   const mean = (measure: unknown, g: string) => desc.rows.find((r) => r.measure === measure && r.group === g)?.mean
   return (
-    <figure className="font-serif text-[11.5px] leading-snug text-[#17191e]">
+    <figure className="font-serif text-[11px] leading-snug text-[#17191e]">
       <figcaption>
         <span className="font-semibold">Table {number}</span>
         <span className="block italic">{caption}</span>
       </figcaption>
-      <table className="mt-1.5 w-full border-collapse">
+      <table className="mt-1 w-full border-collapse">
         <thead>
           <tr>
             {['Measure', ...groups, 'p'].map((h, i) => (
-              <th key={h} className={cn('border-y border-[#17191e] px-1 py-1 font-normal whitespace-nowrap', i ? 'text-right' : 'text-left', h === 'p' && 'italic')}>{h}</th>
+              <th key={h} className={cn('border-y border-[#17191e] px-1 py-0.5 font-normal whitespace-nowrap', i ? 'text-right' : 'text-left', h === 'p' && 'italic')}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={i} className={i === rows.length - 1 ? 'border-b border-[#17191e]' : ''}>
-              <td className="px-1 py-[3px] whitespace-nowrap">{String(r.measure).replace(/\s*\([^)]*\)$/, '')}</td>
+              <td className="px-1 py-[2px] whitespace-nowrap">{String(r.measure).replace(/\s*\([^)]*\)$/, '')}</td>
               {groups.map((g) => <td key={g} className="px-1 text-right tabular-nums">{Number(mean(r.measure, g)).toFixed(1)}</td>)}
               <td className={cn('px-1 text-right whitespace-nowrap tabular-nums', Number(r.p) < 0.05 && 'font-semibold')}>{formatP(Number(r.p))}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="mt-1 text-[10px]"><span className="italic">Note.</span> Group means. One-way ANOVA or Kruskal–Wallis per measure; fictional sample data.</p>
+      <p className="mt-1 text-[9.5px] leading-tight text-ink-2"><span className="italic">Note.</span> Group means. One-way ANOVA or Kruskal–Wallis; fictional data.</p>
     </figure>
   )
 }

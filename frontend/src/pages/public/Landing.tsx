@@ -30,42 +30,42 @@ function DocumentStack() {
   const means = meansOf(d)
   const weight = main?.rows.find((r) => r.measure === 'Fresh Weight (g)')
   return (
-    <div className="relative mx-auto h-[460px] w-full max-w-[520px] sm:h-[500px]" aria-label="Example output from the fertilizer demo">
+    <div className="relative mx-auto h-[480px] w-full max-w-[500px] sm:h-[520px]" aria-label="Example output from the fertilizer demo">
       {/* the spreadsheet */}
-      <div className="animate-in absolute top-2 left-0 w-[64%] -rotate-[4deg] rounded-md border border-paper-line bg-surface shadow-[0_18px_40px_-24px_rgba(20,33,58,0.5)]" style={{ animationDelay: '60ms' }}>
-        <div className="flex items-center justify-between border-b border-paper-line px-3 py-2">
+      <div className="animate-in absolute top-0 left-0 w-[60%] sm:w-[62%] -rotate-[4deg] rounded-md border border-paper-line bg-surface shadow-[0_18px_40px_-24px_rgba(20,33,58,0.5)]" style={{ animationDelay: '60ms' }}>
+        <div className="flex items-center justify-between border-b border-paper-line px-3 py-1.5">
           <span className="font-mono text-[10.5px] text-ink-2">pechay_trial.xlsx</span>
           <span className="font-mono text-[10px] text-ink-2/70">{d?.n_rows ?? '…'} rows</span>
         </div>
         <table className="w-full font-mono text-[10px] text-ink-2">
           <tbody>
-            {(d?.rows ?? []).slice(0, 7).map((r, i) => (
+            {(d?.rows ?? []).slice(0, 6).map((r, i) => (
               <tr key={i} className="border-b border-paper-line/70 last:border-0">
                 {r.slice(1, 5).map((v, j) => (
                   <td key={j} className="px-2 py-1 whitespace-nowrap">{String(v)}</td>
                 ))}
               </tr>
             ))}
-            {!d && Array.from({ length: 7 }).map((_, i) => <tr key={i}><td className="h-5 px-2"><div className="h-2 w-full rounded bg-paper-2" /></td></tr>)}
+            {!d && Array.from({ length: 6 }).map((_, i) => <tr key={i}><td className="h-5 px-2"><div className="h-2 w-full rounded bg-paper-2" /></td></tr>)}
           </tbody>
         </table>
       </div>
 
       {/* the report page */}
-      <div className="animate-in absolute top-16 right-0 w-[78%] rotate-[1.5deg] rounded-[3px] bg-white px-6 pt-6 pb-5 shadow-[0_30px_70px_-30px_rgba(20,33,58,0.55)] ring-1 ring-black/5 sm:top-20" style={{ animationDelay: '160ms' }}>
-        <div className="mb-3 flex items-center justify-between font-serif text-[10px] text-[#6b6f78]">
+      <div className="animate-in absolute top-4 right-0 w-[80%] sm:w-[78%] rotate-[1.5deg] rounded-[3px] bg-white px-5 pt-4 pb-4 sm:px-6 sm:pt-5 sm:pb-4 shadow-[0_24px_60px_-24px_rgba(20,33,58,0.5)] ring-1 ring-black/5 sm:top-6" style={{ animationDelay: '160ms' }}>
+        <div className="mb-2 flex items-center justify-between font-serif text-[10px] text-[#6b6f78]">
           <span>Chapter 4 · Results</span>
           <span>12</span>
         </div>
         {main && desc ? <PaperTable main={main} desc={desc} groups={['Control', 'Vermicompost', 'Inorganic']} caption="Growth of pechay by fertilizer treatment" number={2} /> : <div className="h-32 animate-pulse rounded bg-[#f1efea]" />}
         {means && (
-          <figure className="mt-4">
-            <div className="font-serif text-[11.5px] text-[#17191e]">
+          <figure className="mt-2.5">
+            <div className="font-serif text-[11px] leading-tight text-[#17191e]">
               <span className="font-semibold">Figure 1</span>
               <span className="block italic">Mean fresh weight (g) by treatment, with 95% CIs</span>
             </div>
             <div className="mt-1 [--ink-2:#7b8496] [--ink:#14213a] [--paper-line:#ece8df] [--rust:#b4532a]">
-              <MiniMeans categories={means.categories} series={means.series} height={118} />
+              <MiniMeans categories={means.categories} series={means.series} height={96} />
             </div>
           </figure>
         )}
@@ -73,8 +73,8 @@ function DocumentStack() {
 
       {/* margin note */}
       {weight && (
-        <div className="animate-in absolute bottom-10 left-0 hidden w-[104px] -rotate-[3deg] sm:block" style={{ animationDelay: '320ms' }}>
-          <p className="font-serif text-[14px] leading-tight text-rust italic">
+        <div className="animate-in absolute bottom-4 left-0 hidden w-[104px] -rotate-[3deg] sm:block" style={{ animationDelay: '320ms' }}>
+          <p className="font-serif text-[13.5px] leading-tight text-rust italic">
             Vermicompost: heaviest plants
             <span className="mt-0.5 block not-italic tabular-nums">p {formatP(Number(weight.p)).startsWith('<') ? '' : '= '}{formatP(Number(weight.p))}</span>
           </p>

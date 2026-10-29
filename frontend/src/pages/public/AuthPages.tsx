@@ -116,35 +116,20 @@ const GOOGLE_G = (
 
 function GoogleButton({ next }: { next: string }) {
   const { config } = useAuth()
-  const [note, setNote] = useState(false)
   const enabled = !!config?.google
+  if (!enabled) return null
   return (
     <div className="mt-6">
       <div className="mb-5 flex items-center gap-3 text-[12px] text-ink-2">
         <span className="h-px flex-1 bg-paper-line" /> or <span className="h-px flex-1 bg-paper-line" />
       </div>
-      {enabled ? (
-        <a
-          href={`/api/v1/auth/google/start?next=${encodeURIComponent(next)}`}
-          className="flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-paper-line bg-surface text-[14.5px] font-medium text-ink transition-colors hover:border-ink/40"
-        >
-          {GOOGLE_G}
-          Continue with Google
-        </a>
-      ) : (
-        <>
-          <button
-            type="button"
-            onClick={() => setNote(true)}
-            aria-describedby={note ? 'google-note' : undefined}
-            className="flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-paper-line bg-surface text-[14.5px] font-medium text-ink/60"
-          >
-            {GOOGLE_G}
-            Continue with Google
-          </button>
-          {note && <p id="google-note" role="status" className="mt-2 text-center text-[12.5px] text-ink-2">Google sign-in isn't switched on for this site yet. Use your email for now.</p>}
-        </>
-      )}
+      <a
+        href={`/api/v1/auth/google/start?next=${encodeURIComponent(next)}`}
+        className="flex h-11 w-full items-center justify-center gap-2.5 rounded-full border border-paper-line bg-surface text-[14.5px] font-medium text-ink transition-colors hover:border-ink/40"
+      >
+        {GOOGLE_G}
+        Continue with Google
+      </a>
     </div>
   )
 }
