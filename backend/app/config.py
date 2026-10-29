@@ -59,6 +59,10 @@ class Settings(BaseSettings):
 
     # Root for uploaded files, Parquet datasets and generated reports.
     storage_dir: Path = Field(default_factory=_get_default_storage_dir)
+    # Keep a copy of datasets, originals and exports in the metadata database, for hosts whose disk is
+    # wiped on restart (Render free plan, serverless). Files larger than persist_max_mb stay local only.
+    persist_files_in_db: bool = False
+    persist_max_mb: int = 50
 
     # "password" (default): accounts with email/password and optional Google sign-in.
     # "local": a single local administrator is provisioned automatically; no login (offline use only).

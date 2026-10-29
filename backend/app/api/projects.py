@@ -18,7 +18,7 @@ from ..models import (
     Project,
     Variable,
 )
-from ..storage import new_relative_path, resolve
+from ..storage import new_relative_path, remove, resolve
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -107,7 +107,7 @@ def delete_project(project_id: int, user: CurrentUser, db: DB):
     db.commit()
     for rel in paths:
         try:
-            resolve(rel).unlink(missing_ok=True)
+            remove(rel)
         except Exception:  # noqa: BLE001 - metadata is gone; orphaned files are harmless
             pass
 

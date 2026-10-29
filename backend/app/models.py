@@ -12,6 +12,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -292,6 +293,17 @@ class QueryHistory(Base):
     duration_ms: Mapped[float | None] = mapped_column(Float)
     error_message: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow, index=True)
+
+
+class StoredFile(Base):
+    """Database copy of a file under storage_dir (see ``persist_files_in_db``)."""
+
+    __tablename__ = "stored_files"
+
+    path: Mapped[str] = mapped_column(String(255), primary_key=True)
+    size: Mapped[int] = mapped_column(BigInteger)
+    data: Mapped[bytes] = mapped_column(LargeBinary)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=utcnow)
 
 
 class Report(Base):

@@ -16,7 +16,7 @@ from ..models import AnalysisResult, Dataset, DatasetVersion, Export
 from ..reports.docx_export import build_docx, verify_docx
 from ..reports.options import PRESETS, SECTION_KEYS, ReportOptions
 from ..reports.xlsx_export import build_xlsx, verify_xlsx
-from ..storage import new_relative_path, resolve, safe_filename
+from ..storage import new_relative_path, remove, resolve, safe_filename
 from ..storage import resolve as resolve_path
 
 router = APIRouter(prefix="/exports", tags=["exports"])
@@ -158,7 +158,7 @@ def download_export(export_id: int, user: CurrentUser, db: DB):
 def delete_export(export_id: int, user: CurrentUser, db: DB):
     e = _export(db, user, export_id)
     if e.artifact_path:
-        resolve(e.artifact_path).unlink(missing_ok=True)
+        remove(e.artifact_path)
     db.delete(e)
     db.commit()
 

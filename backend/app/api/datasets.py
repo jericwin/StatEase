@@ -15,7 +15,7 @@ from ..deps import DB, CurrentUser, audit, get_dataset, get_project, get_version
 from ..errors import AppError
 from ..models import Dataset, Variable
 from ..services import VAR_FIELDS, add_version, create_dataset, latest_version, refresh_profile
-from ..storage import new_relative_path, resolve, safe_filename
+from ..storage import new_relative_path, remove, resolve, safe_filename
 
 router = APIRouter(tags=["datasets"])
 
@@ -135,7 +135,7 @@ def delete_dataset(dataset_id: int, user: CurrentUser, db: DB):
     db.delete(ds)
     db.commit()
     for rel in paths:
-        resolve(rel).unlink(missing_ok=True)
+        remove(rel)
 
 
 def _version(db, user, dataset_id: int, version_id: int | None):

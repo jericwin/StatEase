@@ -4,7 +4,9 @@ services:
     runtime: docker
     dockerfilePath: Dockerfile
     plan: free
-    region: oregon
+    # Same AWS region as the Neon database (us-east-1).
+    region: virginia
+    healthCheckPath: /api/v1/health
     envVars:
       - key: STATEASE_ENVIRONMENT
         value: production
@@ -16,6 +18,17 @@ services:
         sync: false
       - key: STATEASE_PUBLIC_URL
         value: https://statease.vercel.app
+      # The free plan has no persistent disk: keep datasets and exports in the database as well.
+      - key: STATEASE_PERSIST_FILES_IN_DB
+        value: "true"
+      - key: STATEASE_ENABLE_PYTHON_CONSOLE
+        value: "false"
+      - key: STATEASE_ANALYSIS_WORKERS
+        value: "1"
+      - key: STATEASE_GOOGLE_CLIENT_ID
+        sync: false
+      - key: STATEASE_GOOGLE_CLIENT_SECRET
+        sync: false
       - key: STATEASE_SMTP_HOST
         value: smtp.gmail.com
       - key: STATEASE_SMTP_PORT
@@ -30,3 +43,6 @@ services:
         value: "true"
       - key: STATEASE_CORS_ORIGINS
         value: '["https://statease.vercel.app"]'
+      # Requests arrive through Vercel and Render's proxy; take the client address from X-Forwarded-For.
+      - key: FORWARDED_ALLOW_IPS
+        value: "*"

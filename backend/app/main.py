@@ -5,11 +5,13 @@ import logging
 import os
 from pathlib import Path
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
+from . import storage
 from .api import auth, misc, projects
 
 try:
@@ -85,6 +87,26 @@ def create_app() -> FastAPI:
     app.add_middleware(CORSMiddleware, allow_origins=s.cors_origins, allow_credentials=False,
                        allow_methods=["*"], allow_headers=["Authorization", "Content-Type"])
     install_handlers(app)
+
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        if request.url.path.startswith("/api/"):
+            response.headers.setdefault("Cache-Control", "no-store")
+        return response
+
+    if s.persist_files_in_db:
+        @app.middleware("http")
+        async def persist_files(request: Request, call_next):
+            touched = storage.track_request()
+            try:
+                return await call_next(request)
+            finally:
+                await run_in_threadpool(storage.persist_tracked, touched)
+
     api = APIRouter(prefix="/api/v1")
     for r in (auth.router, projects.router, misc.router):
         api.include_router(r)
