@@ -52,7 +52,7 @@ function DocumentStack() {
       </div>
 
       {/* the report page */}
-      <div className="animate-in absolute top-4 right-0 w-[80%] sm:w-[78%] rotate-[1.5deg] rounded-[3px] bg-white px-5 pt-4 pb-4 sm:px-6 sm:pt-5 sm:pb-4 shadow-[0_24px_60px_-24px_rgba(20,33,58,0.5)] ring-1 ring-black/5 sm:top-6" style={{ animationDelay: '160ms' }}>
+      <div className="animate-in absolute top-4 right-0 w-[92%] sm:w-[78%] rotate-[1.5deg] rounded-[3px] bg-white px-4 pt-4 pb-4 sm:px-6 sm:pt-5 sm:pb-4 shadow-[0_24px_60px_-24px_rgba(20,33,58,0.5)] ring-1 ring-black/5 sm:top-6" style={{ animationDelay: '160ms' }}>
         <div className="mb-2 flex items-center justify-between font-serif text-[10px] text-[#6b6f78]">
           <span>Chapter 4 · Results</span>
           <span>12</span>
