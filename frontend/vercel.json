@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "name": "statease",
   "framework": "vite",
   "rewrites": [
     {
@@ -8,4 +9,3 @@
     }
   ]
 }
-
