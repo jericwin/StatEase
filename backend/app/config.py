@@ -6,6 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -19,6 +20,13 @@ class Settings(BaseSettings):
     # Metadata database. SQLite by default (single-user local mode); set a
     # postgresql+psycopg:// URL for the full multi-user deployment.
     database_url: str = f"sqlite:///{(BACKEND_DIR / 'var' / 'statease.db').as_posix()}"
+
+    @field_validator("database_url", mode="after")
+    @classmethod
+    def normalize_db_url(cls, v: str) -> str:
+        if v and v.startswith("postgres://"):
+            return "postgresql://" + v[len("postgres://"):]
+        return v
 
     # Root for uploaded files, Parquet datasets and generated reports.
     storage_dir: Path = BACKEND_DIR / "var" / "storage"

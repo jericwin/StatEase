@@ -6,6 +6,18 @@
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
+      "source": "/api/(.*)",
+      "destination": "https://statease-api.onrender.com/api/$1"
+    },
+    {
+      "source": "/docs",
+      "destination": "https://statease-api.onrender.com/docs"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "https://statease-api.onrender.com/openapi.json"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

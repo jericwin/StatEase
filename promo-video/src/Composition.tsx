@@ -5,8 +5,10 @@ import {
   Sequence,
   interpolate,
   useCurrentFrame,
+  staticFile,
   useVideoConfig,
 } from "remotion";
+import { Audio } from "@remotion/media";
 import { SceneFrame } from "./parts";
 import { Export, Intro, Outro, Results, Suggest, Upload } from "./scenes";
 import { c, clamp } from "./theme";
@@ -90,6 +92,25 @@ export const StatEasePromo: React.FC = () => {
         <Outro />
       </Sequence>
       <Progress />
+      {/* Voiceover, one clip per scene (regenerate with generate-voiceover.sh) */}
+      <Sequence name="VO Intro" from={0.1 * fps} layout="none">
+        <Audio src={staticFile("voiceover/01-intro.mp3")} />
+      </Sequence>
+      <Sequence name="VO Upload" from={2.85 * fps} layout="none">
+        <Audio src={staticFile("voiceover/02-upload.mp3")} />
+      </Sequence>
+      <Sequence name="VO Analyze" from={5.7 * fps} layout="none">
+        <Audio src={staticFile("voiceover/03-analyze.mp3")} />
+      </Sequence>
+      <Sequence name="VO Results" from={8.7 * fps} layout="none">
+        <Audio src={staticFile("voiceover/04-results.mp3")} />
+      </Sequence>
+      <Sequence name="VO Export" from={11.7 * fps} layout="none">
+        <Audio src={staticFile("voiceover/05-export.mp3")} />
+      </Sequence>
+      <Sequence name="VO Outro" from={13.6 * fps} layout="none">
+        <Audio src={staticFile("voiceover/06-outro.mp3")} />
+      </Sequence>
     </AbsoluteFill>
   );
 };

@@ -41,3 +41,5 @@ frontend/playwright-report/
 .gemini/
 .DS_Store
 Thumbs.db
+
+.vercel
